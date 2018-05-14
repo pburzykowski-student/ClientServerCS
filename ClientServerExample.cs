@@ -11,21 +11,9 @@ namespace ClientServer
     {
         static void Main(string[] args)
         {
-            new Thread(() =>
-            {
-                Server.Program serverProgram = new Server.Program();
-            }).Start();
-
-            new Thread(() =>
-            {
-                Client.Program clientProgram = new Client.Program();
-            }).Start();
-
-            /*new Thread(() =>
-            {
-                Client.Program clientProgram = new Client.Program();
-            }).Start();*/
-
+            Server.Program serverProgram = new Server.Program();
+            Client.Program clientProgram = new Client.Program();
+            Client.Program clientProgram2 = new Client.Program();
 
             Console.ReadKey();
         }

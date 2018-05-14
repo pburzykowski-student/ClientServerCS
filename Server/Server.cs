@@ -23,17 +23,17 @@ namespace ClientServer.Server
         {
             address = ConnectionConfig.defaultServerAddress;
             port = ConnectionConfig.defalutServerPort;
-            init();
+            Init();
          }
 
         public Server(String address, int port)
         {
             this.address = address;
             this.port = port;
-            init();
+            Init();
         }
 
-        public void init()
+        public void Init()
         {
             server = new TcpListener(IPAddress.Parse(address), port);
             server.Start();
@@ -41,33 +41,57 @@ namespace ClientServer.Server
 
         public void Listen()
         {
-            while (true)
+            new Thread(() =>
             {
-                Console.WriteLine("Server waiting for a connection...");
-                TcpClient client = server.AcceptTcpClient();
-                Thread clientThread = new Thread(
-                    () => HandleClient(client));
+                while (true)
+                {
+                    Console.WriteLine("Server waiting for a connection...");
+                    TcpClient client = server.AcceptTcpClient();
+                    Thread clientThread = new Thread(
+                        () => HandleClient(client));
 
-                clientThread.Start();
-            }
+                    clientThread.Start();
+                }
+            }).Start();
         }
 
         private void HandleClient(TcpClient client)
         {
             Console.WriteLine("Server handle Client :: Connection detect");
-            readData(client);
+            ReadData(client);
             Console.WriteLine("Server handle Client :: stop reading");
         }
 
-        private void readData(TcpClient client)
+        private void ReadData(TcpClient client)
         {
             Console.WriteLine("Server handle Client :: ReadData");
             NetworkStream stream = client.GetStream();
-            int messageSize = readIncomingMessageSize(stream);            
+            int messageSize = ReadIncomingMessageSize(stream);
+            String message = ReadMessage(stream, messageSize);
+            Console.WriteLine(message);
 
-            byte [] bytes = new Byte[messageSize];
+            stream.Close();
+            client.Close();
+        }
+
+        private int ReadIncomingMessageSize(NetworkStream stream)
+        {
+            byte[] bytes = new Byte[sizeof(Int32)];
+            int readed = stream.Read(bytes, 0, bytes.Length);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
+
+            return BitConverter.ToInt32(bytes, 0);
+        }
+
+        private String ReadMessage(NetworkStream stream, int messageSize)
+        {
+            byte[] bytes = new Byte[messageSize];
             int readed = 0;
-
+            
             do
             {
                 try
@@ -81,25 +105,8 @@ namespace ClientServer.Server
             } while (readed != messageSize);
 
 
-            Console.WriteLine(Encoding.ASCII.GetString(bytes, 0, messageSize));
-
-            stream.Close();
-            client.Close();
+            return Encoding.ASCII.GetString(bytes, 0, messageSize);
         }
-
-        private int readIncomingMessageSize(NetworkStream stream)
-        {
-            byte[] bytes = new Byte[sizeof(Int32)];
-            int readed = stream.Read(bytes, 0, bytes.Length);
-
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-
-            return BitConverter.ToInt32(bytes, 0);
-        }
-
 
         public void Dispose()
         {

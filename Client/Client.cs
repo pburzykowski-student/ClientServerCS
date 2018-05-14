@@ -46,7 +46,7 @@ namespace ClientServer.Client
             }
         }
 
-        public void SendData(byte[] data)
+        private void SendData(byte[] data)
         {
             try
             {
@@ -56,6 +56,21 @@ namespace ClientServer.Client
                 Console.Error.WriteLine("Writing to server socket error\n" + e.Message);
                 Console.ReadKey();
             }
+        }
+
+        public void SendMessage(String message)
+        {
+            byte[] data = Encoding.ASCII.GetBytes(message);
+            Int32 size = data.Length;
+
+            byte[] sizeOfData = BitConverter.GetBytes(size);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(sizeOfData);
+            }
+
+            SendData(sizeOfData);
+            SendData(data);
         }
 
         public void Dispose()
