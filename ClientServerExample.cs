@@ -13,7 +13,7 @@ namespace ClientServer
         {
             Server.Program serverProgram = new Server.Program();
             Client.Program clientProgram = new Client.Program();
-            Client.Program clientProgram2 = new Client.Program();
+            //Client.Program clientProgram2 = new Client.Program();
 
             Console.ReadKey();
         }

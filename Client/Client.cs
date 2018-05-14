@@ -1,8 +1,10 @@
 ﻿using ClientServer.Config;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -61,6 +63,22 @@ namespace ClientServer.Client
         public void SendMessage(String message)
         {
             byte[] data = Encoding.ASCII.GetBytes(message);
+            Int32 size = data.Length;
+
+            byte[] sizeOfData = BitConverter.GetBytes(size);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(sizeOfData);
+            }
+
+            SendData(sizeOfData);
+            SendData(data);
+        }
+
+        public void SendFile(String filename)
+        {
+
+            byte[] data = System.IO.File.ReadAllBytes("..\\..\\Client\\" + filename);
             Int32 size = data.Length;
 
             byte[] sizeOfData = BitConverter.GetBytes(size);

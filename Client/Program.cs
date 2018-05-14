@@ -12,7 +12,7 @@ namespace ClientServer.Client
         {
             Client client = new Client();
             client.Connect();
-            client.SendMessage("to jest test");
+            client.SendFile("FileClient.txt");
         }
     }
 }

@@ -16,8 +16,6 @@ namespace ClientServer.Server
         private int port;
         private TcpListener server;
 
-        private const int MESSAGE_SIZE = 256;
-        private const int BUFFOR_SIZE = 32;
 
         public Server()
         {
@@ -91,12 +89,29 @@ namespace ClientServer.Server
         {
             byte[] bytes = new Byte[messageSize];
             int readed = 0;
-            
+            int bufforSize = 2;
             do
             {
                 try
                 {
-                    readed += stream.Read(bytes, readed, messageSize - readed);
+                    
+
+                    Console.WriteLine("Press enter to continue reading. Press any other key to stop: ");
+                    if(Console.ReadKey().Key != ConsoleKey.Enter)
+                    {
+                        break;
+                    }
+
+                    if(bufforSize > messageSize)
+                    {
+                        bufforSize = messageSize;
+                    } else if (readed + bufforSize > messageSize)
+                    {
+                        bufforSize = messageSize - readed;
+                    }
+
+                    readed += stream.Read(bytes, readed, bufforSize);
+
                 }
                 catch (System.IO.IOException e)
                 {
@@ -104,7 +119,7 @@ namespace ClientServer.Server
                 }
             } while (readed != messageSize);
 
-
+            Console.WriteLine("End of reading");
             return Encoding.ASCII.GetString(bytes, 0, messageSize);
         }
 
