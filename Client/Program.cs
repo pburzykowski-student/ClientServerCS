@@ -12,6 +12,20 @@ namespace ClientServer.Client
         {
             Client client = new Client();
             client.Connect();
+
+            byte[] data = Encoding.ASCII.GetBytes("test");
+
+            Int32 size = data.Length;
+
+            byte[] sizeOfData = BitConverter.GetBytes(size);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(sizeOfData);
+            }
+
+            client.SendData(sizeOfData);
+            client.SendData(data);
+
         }
     }
 }

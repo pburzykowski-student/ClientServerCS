@@ -9,11 +9,12 @@ using System.Threading.Tasks;
 namespace ClientServer.Client
 {
 
-    class Client
+    class Client : IDisposable
     {
         private String serverAddress;
         private int serverPort;
         private TcpClient tcpClient;
+        private NetworkStream networkStream;
 
         public Client()
         {
@@ -35,6 +36,7 @@ namespace ClientServer.Client
             {
                 Console.WriteLine("Client connecting to server");
                 tcpClient.Connect(serverAddress, serverPort);
+                networkStream = tcpClient.GetStream();
             }
             catch(SocketException e)
             {
@@ -42,6 +44,24 @@ namespace ClientServer.Client
                 Console.ReadKey();
                 Environment.Exit(-1);
             }
+        }
+
+        public void SendData(byte[] data)
+        {
+            try
+            {
+                networkStream.Write(data, 0, data.Length);
+            } catch(SocketException e)
+            {
+                Console.Error.WriteLine("Writing to server socket error\n" + e.Message);
+                Console.ReadKey();
+            }
+        }
+
+        public void Dispose()
+        {
+            networkStream.Close();
+            tcpClient.Close();
         }
 
     }

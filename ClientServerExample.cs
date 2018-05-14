@@ -16,14 +16,17 @@ namespace ClientServer
                 Server.Program serverProgram = new Server.Program();
             }).Start();
 
-            Thread.Sleep(500);
-
             new Thread(() =>
             {
                 Client.Program clientProgram = new Client.Program();
             }).Start();
 
-            
+            /*new Thread(() =>
+            {
+                Client.Program clientProgram = new Client.Program();
+            }).Start();*/
+
+
             Console.ReadKey();
         }
         
